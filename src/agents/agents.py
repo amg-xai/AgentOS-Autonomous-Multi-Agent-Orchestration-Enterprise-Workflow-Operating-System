@@ -32,7 +32,7 @@ def synthesizer(state):
            f"Related: {state.get('related_incidents')}")
     raw = call_llm("You SYNTHESIZE a draft incident record. Respond ONLY as JSON, no markdown, no code fences. "
                    "Keys and allowed values: "
-                   "severity (one of: SEV-1, SEV-2, SEV-3), "
+                   "severity (SEV-1 = >25% errors or full outage; SEV-2 = 5-25% errors, partial; SEV-3 = <5%, minor), "
                    "owner (one of: payments-team, platform-team, frontend-team, unassigned), "
                    "root_cause_hypothesis (string), "
                    "recommended_action (string).", ctx)
