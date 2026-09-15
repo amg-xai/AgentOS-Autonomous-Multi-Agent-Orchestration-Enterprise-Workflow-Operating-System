@@ -12,12 +12,12 @@ def run_baseline(alert: str, incident_id: str = "incident-001") -> dict:
         f"Recent deploys:\n{T.recent_deploys()}\n\n"
         f"Past incidents:\n{T.search_incidents()}"
     )
-    raw = call_llm(
-        "You are a SINGLE incident-response agent. Read everything and SYNTHESIZE a draft "
-        "incident record. Respond ONLY as JSON with keys: severity, owner, "
-        "root_cause_hypothesis, recommended_action.",
-        context,
-    )
+    raw = call_llm("You SYNTHESIZE a draft incident record. Respond ONLY as JSON, no markdown, no code fences. "
+                   "Keys and allowed values: "
+                   "severity (one of: SEV-1, SEV-2, SEV-3), "
+                   "owner (one of: payments-team, platform-team, frontend-team, unassigned), "
+                   "root_cause_hypothesis (string), "
+                   "recommended_action (string).", ctx)
     try:
         draft = json.loads(raw)
     except Exception:

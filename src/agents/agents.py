@@ -30,8 +30,12 @@ def synthesizer(state):
     ctx = (f"Alert: {state['alert']}\nComms: {state.get('comms_summary')}\n"
            f"Logs: {state.get('log_findings')}\nDeploys: {state.get('deploy_correlation')}\n"
            f"Related: {state.get('related_incidents')}")
-    raw = call_llm("You SYNTHESIZE a draft incident record. Respond ONLY as JSON with keys: "
-                   "severity, owner, root_cause_hypothesis, recommended_action.", ctx)
+    raw = call_llm("You SYNTHESIZE a draft incident record. Respond ONLY as JSON, no markdown, no code fences. "
+                   "Keys and allowed values: "
+                   "severity (one of: SEV-1, SEV-2, SEV-3), "
+                   "owner (one of: payments-team, platform-team, frontend-team, unassigned), "
+                   "root_cause_hypothesis (string), "
+                   "recommended_action (string).", ctx)
     try:
         draft = json.loads(raw)
     except Exception:
