@@ -1,6 +1,6 @@
 import json
 from src.tools import mock_tools as T
-from src.llm_stub import call_llm
+from src.llm import call_llm
 
 def supervisor(state):
     plan = call_llm("You are the SUPERVISOR agent for incident response. Make a short investigation plan.",

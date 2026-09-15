@@ -2,7 +2,7 @@
 This is the control condition we compare the full multi-agent system against."""
 import json
 from src.tools import mock_tools as T
-from src.llm_stub import call_llm   # swap for src.llm later
+from src.llm import call_llm   # swap for src.llm later
 
 def run_baseline(alert: str, incident_id: str = "incident-001") -> dict:
     context = (
