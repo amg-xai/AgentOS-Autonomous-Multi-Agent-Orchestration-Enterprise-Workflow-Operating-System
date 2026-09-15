@@ -1,0 +1,20 @@
+[
+  {
+    "id": "clear-01",
+    "type": "clear",
+    "alert": "Monitoring: checkout 500 error rate 12% since 14:20",
+    "expected": {"severity": "SEV-2", "owner": "payments-team"}
+  },
+  {
+    "id": "duplicate-01",
+    "type": "duplicate",
+    "alert": "Checkout returning 500s again, looks like the INC-204 issue",
+    "expected": {"severity": "SEV-2", "owner": "payments-team"}
+  },
+  {
+    "id": "vague-01",
+    "type": "vague",
+    "alert": "Something feels off with payments, a few users complained",
+    "expected": {"severity": "SEV-3", "owner": "payments-team"}
+  }
+]
