@@ -17,7 +17,7 @@ def run_baseline(alert: str, incident_id: str = "incident-001") -> dict:
                    "severity (one of: SEV-1, SEV-2, SEV-3), "
                    "owner (one of: payments-team, platform-team, frontend-team, unassigned), "
                    "root_cause_hypothesis (string), "
-                   "recommended_action (string).", ctx)
+                   "recommended_action (string).", context)
     try:
         draft = json.loads(raw)
     except Exception:
