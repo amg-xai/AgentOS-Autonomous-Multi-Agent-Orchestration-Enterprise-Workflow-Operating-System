@@ -1,20 +1,74 @@
 [
   {
     "id": "clear-01",
-    "type": "clear",
+    "type": "easy",
     "alert": "Monitoring: checkout 500 error rate 12% since 14:20",
+    "data": {
+      "slack": "14:22 @user: checkout throwing 500s\n14:25 @user2: ~1 in 8 requests failing",
+      "logs": "14:18 ERROR NullPointerException at CheckoutHandler.process()\nerror_rate=12% window=5m",
+      "deploys": "14:15 payment-service v2.3.1 by @dev (PR #412: refactor checkout handler)",
+      "incidents": "INC-204: checkout 500s after payment deploy (resolved by rollback)"
+    },
     "expected": {"severity": "SEV-2", "owner": "payments-team"}
   },
   {
-    "id": "duplicate-01",
-    "type": "duplicate",
-    "alert": "Checkout returning 500s again, looks like the INC-204 issue",
+    "id": "clear-02",
+    "type": "easy",
+    "alert": "Monitoring: full outage, all API requests failing since 09:02",
+    "data": {
+      "slack": "09:03 @oncall: everything is down, 100% errors",
+      "logs": "09:01 FATAL cannot connect to primary database; connection refused; error_rate=100%",
+      "deploys": "08:58 platform-service v5.0 by @ops (PR #900: database failover config change)",
+      "incidents": "INC-150: full outage after DB config change (resolved by config revert)"
+    },
+    "expected": {"severity": "SEV-1", "owner": "platform-team"}
+  },
+  {
+    "id": "red-herring-01",
+    "type": "hard",
+    "alert": "Monitoring: high CPU on frontend-service, checkout slow, 8% errors since 16:40",
+    "data": {
+      "slack": "16:42 @user: checkout feels slow and sometimes errors\n16:50 @dev: frontend CPU is pegged at 95%, scaling it up didn't help",
+      "logs": "16:41 WARN frontend-service CPU 95%\n16:41 ERROR checkout timeout waiting for payment-service response (>3s)\nerror_rate=8%",
+      "deploys": "16:20 payment-service v2.4.0 by @dev (PR #501: added synchronous fraud-check call)\n15:00 frontend-service v4.1 by @fe (PR #488: CSS tweak)",
+      "incidents": "INC-233: frontend slowness actually caused by a slow downstream payment dependency"
+    },
     "expected": {"severity": "SEV-2", "owner": "payments-team"}
   },
   {
-    "id": "vague-01",
-    "type": "vague",
-    "alert": "Something feels off with payments, a few users complained",
-    "expected": {"severity": "SEV-3", "owner": "payments-team"}
+    "id": "missing-info-01",
+    "type": "hard",
+    "alert": "Monitoring: intermittent 6% error rate on orders since 11:10",
+    "data": {
+      "slack": "11:12 @user: some orders failing\n11:20 @dev: logs aren't showing anything obvious. started right after that config change?",
+      "logs": "11:09 ERROR connection reset\n11:11 ERROR connection reset\n(no stack trace) error_rate=6%",
+      "deploys": "11:05 payment-service config change by @ops (PR #522: reduced DB connection pool size from 50 to 5)",
+      "incidents": "INC-198: intermittent resets traced to an undersized connection pool"
+    },
+    "expected": {"severity": "SEV-2", "owner": "payments-team"}
+  },
+  {
+    "id": "conflicting-severity-01",
+    "type": "hard",
+    "alert": "Monitoring: CRITICAL alert fired on admin-tools since 13:00",
+    "data": {
+      "slack": "13:05 @admin: the internal refund dashboard is erroring for me\n13:10 @oncall: looks like only the 2 of us on the admin team are affected, customers fine",
+      "logs": "13:01 ERROR admin-tools refund page 500\nrequests_affected=3 users_affected=2 error_rate=0.3%",
+      "deploys": "12:50 admin-tools v1.2 by @dev (PR #77: refund page refactor)",
+      "incidents": "INC-101: admin-only tool error, low impact, fixed next business day"
+    },
+    "expected": {"severity": "SEV-3", "owner": "platform-team"}
+  },
+  {
+    "id": "cross-source-01",
+    "type": "hard",
+    "alert": "Monitoring: checkout errors 9% since 18:30, cause unclear",
+    "data": {
+      "slack": "18:33 @user: checkout errors again\n18:40 @fe: we deployed frontend at 18:25, could be us\n18:45 @pay: we also deployed payments at 18:10",
+      "logs": "18:31 ERROR checkout received malformed request: missing field 'currency'\nerror_rate=9%",
+      "deploys": "18:25 frontend-service v4.2 by @fe (PR #610: changed checkout request payload, dropped 'currency' field)\n18:10 payment-service v2.5 by @pay (PR #611: logging improvements)",
+      "incidents": "INC-240: checkout failures caused by a frontend payload change that dropped a required field"
+    },
+    "expected": {"severity": "SEV-2", "owner": "frontend-team"}
   }
 ]
