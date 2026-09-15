@@ -55,7 +55,7 @@
       "slack": "13:05 @admin: the internal refund dashboard is erroring for me\n13:10 @oncall: looks like only the 2 of us on the admin team are affected, customers fine",
       "logs": "13:01 ERROR admin-tools refund page 500\nrequests_affected=3 users_affected=2 error_rate=0.3%",
       "deploys": "12:50 admin-tools v1.2 by @dev (PR #77: refund page refactor)",
-      "incidents": "INC-101: admin-only tool error, low impact, fixed next business day"
+      "incidents": "INC-101: admin-only tool error, low impact, fixed next business day. Note: admin-tools is owned by platform-team."
     },
     "expected": {"severity": "SEV-3", "owner": "platform-team"}
   },
