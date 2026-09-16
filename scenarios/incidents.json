@@ -70,5 +70,125 @@
       "incidents": "INC-240: checkout failures caused by a frontend payload change that dropped a required field"
     },
     "expected": {"severity": "SEV-2", "owner": "frontend-team"}
+  },
+  {
+    "id": "db-outage-01",
+    "type": "easy",
+    "alert": "Monitoring: 100% error rate on all endpoints since 03:15",
+    "data": {
+      "slack": "03:16 @oncall: total outage, nothing responding\n03:18 @oncall: DB looks unreachable",
+      "logs": "03:14 FATAL could not acquire DB connection: host unreachable\nerror_rate=100%",
+      "deploys": "02:40 platform-service v6.2 by @ops (PR #720: switched DB host to new cluster)",
+      "incidents": "INC-150: full outage after DB config change (resolved by revert)"
+    },
+    "expected": {"severity": "SEV-1", "owner": "platform-team"}
+  },
+  {
+    "id": "slow-frontend-01",
+    "type": "easy",
+    "alert": "Monitoring: frontend page load p95 up to 8s, 2% errors since 10:05",
+    "data": {
+      "slack": "10:07 @user: site feels sluggish\n10:10 @fe: we shipped a big JS bundle this morning",
+      "logs": "10:06 WARN frontend bundle size 4.2MB, first-paint slow\nerror_rate=2%",
+      "deploys": "09:50 frontend-service v4.5 by @fe (PR #640: added analytics library, +2MB bundle)",
+      "incidents": "INC-177: frontend slowness from oversized JS bundle (fixed by lazy-loading)"
+    },
+    "expected": {"severity": "SEV-3", "owner": "frontend-team"}
+  },
+  {
+    "id": "partial-payments-01",
+    "type": "easy",
+    "alert": "Monitoring: payment failures 15% since 20:30",
+    "data": {
+      "slack": "20:32 @user: card payments failing intermittently\n20:35 @pay: seeing gateway timeouts",
+      "logs": "20:29 ERROR payment gateway timeout after 5s\nerror_rate=15%",
+      "deploys": "20:15 payment-service v3.0 by @pay (PR #810: lowered gateway timeout 30s->5s)",
+      "incidents": "INC-236: payment 500s from a too-low gateway timeout (restored timeout)"
+    },
+    "expected": {"severity": "SEV-2", "owner": "payments-team"}
+  },
+  {
+    "id": "cache-stampede-01",
+    "type": "hard",
+    "alert": "Monitoring: DB CPU 98%, API latency spiking, 7% errors since 12:00",
+    "data": {
+      "slack": "12:03 @oncall: DB is on fire, CPU maxed\n12:08 @dev: but we didn't touch the DB... cache maybe?",
+      "logs": "12:01 WARN cache miss rate 95% (normally 5%)\n12:02 ERROR DB query timeout under load\nerror_rate=7%",
+      "deploys": "11:45 platform-service v6.3 by @ops (PR #733: cache TTL changed 1h->10s by mistake)",
+      "incidents": "INC-211: DB overload caused by a cache misconfiguration, not the DB itself. platform-service owns caching."
+    },
+    "expected": {"severity": "SEV-2", "owner": "platform-team"}
+  },
+  {
+    "id": "auth-token-01",
+    "type": "hard",
+    "alert": "Monitoring: 30% of API requests returning 401 since 15:20",
+    "data": {
+      "slack": "15:22 @user: users getting logged out randomly\n15:28 @dev: 401s spiking, looks like auth",
+      "logs": "15:19 ERROR token signature verification failed\nerror_rate=30% status=401",
+      "deploys": "15:10 platform-service v6.4 by @ops (PR #740: rotated JWT signing key)\n14:00 frontend-service v4.6 by @fe (PR #648: minor CSS)",
+      "incidents": "INC-260: mass 401s after a JWT key rotation that missed one service. auth is platform-team."
+    },
+    "expected": {"severity": "SEV-1", "owner": "platform-team"}
+  },
+  {
+    "id": "third-party-01",
+    "type": "hard",
+    "alert": "Monitoring: checkout 5% errors since 17:00, cause unclear",
+    "data": {
+      "slack": "17:03 @user: some checkouts failing\n17:10 @pay: our code is unchanged today\n17:15 @pay: our payment provider's status page shows a partial outage",
+      "logs": "17:01 ERROR external payment provider returned 503\nerror_rate=5%",
+      "deploys": "(no deploys in the last 24h)",
+      "incidents": "INC-244: checkout errors traced to a third-party provider outage; mitigation was a fallback provider. payments-team owns the integration."
+    },
+    "expected": {"severity": "SEV-3", "owner": "payments-team"}
+  },
+  {
+    "id": "memory-leak-01",
+    "type": "hard",
+    "alert": "Monitoring: orders-service restarting repeatedly, 10% errors since 08:00",
+    "data": {
+      "slack": "08:05 @oncall: orders-service keeps OOM-killing and restarting\n08:12 @dev: memory climbs then crashes every ~20min",
+      "logs": "07:58 ERROR OutOfMemoryError; container killed\n08:20 ERROR OutOfMemoryError; container killed\nerror_rate=10%",
+      "deploys": "yesterday 18:00 orders-service v2.1 by @dev (PR #690: new in-memory cache, no eviction)",
+      "incidents": "INC-219: repeated OOM from an unbounded in-memory cache. orders-service is owned by platform-team."
+    },
+    "expected": {"severity": "SEV-2", "owner": "platform-team"}
+  },
+  {
+    "id": "false-alarm-01",
+    "type": "hard",
+    "alert": "Monitoring: CRITICAL fired on checkout latency since 22:00",
+    "data": {
+      "slack": "22:05 @oncall: alert fired but checkout looks fine to me\n22:10 @oncall: only the synthetic monitor in one region is failing, real users unaffected",
+      "logs": "22:01 WARN synthetic probe timeout from eu-west-3 only\nreal_user_error_rate=0.1%",
+      "deploys": "(no deploys)",
+      "incidents": "INC-180: false alarm from a broken synthetic monitor in one region; no user impact. monitoring owned by platform-team."
+    },
+    "expected": {"severity": "SEV-3", "owner": "platform-team"}
+  },
+  {
+    "id": "cascading-01",
+    "type": "hard",
+    "alert": "Monitoring: multiple services erroring, 20% errors since 13:30",
+    "data": {
+      "slack": "13:33 @oncall: orders, checkout, and search all erroring\n13:40 @dev: they all call the user-service... which is timing out",
+      "logs": "13:31 ERROR user-service timeout (downstream)\n13:31 ERROR checkout failed: user-service unavailable\nerror_rate=20%",
+      "deploys": "13:20 user-service v3.4 by @dev (PR #700: added a slow synchronous audit-log write on every call)",
+      "incidents": "INC-230: cascading failures traced to a single slow upstream (user-service). user-service is platform-team."
+    },
+    "expected": {"severity": "SEV-1", "owner": "platform-team"}
+  },
+  {
+    "id": "config-drift-01",
+    "type": "hard",
+    "alert": "Monitoring: search returning empty results, 0 errors but 4% of sessions affected since 09:30",
+    "data": {
+      "slack": "09:33 @user: search returns nothing for valid queries\n09:40 @dev: no errors in logs though, requests are 200 OK",
+      "logs": "09:31 INFO search request 200 OK results=0\n(no errors) error_rate=0%",
+      "deploys": "09:15 search-service v1.8 by @dev (PR #655: changed default search index name, typo in config)",
+      "incidents": "INC-205: silent empty-results from a wrong index name in config. search-service is owned by frontend-team."
+    },
+    "expected": {"severity": "SEV-3", "owner": "frontend-team"}
   }
 ]
