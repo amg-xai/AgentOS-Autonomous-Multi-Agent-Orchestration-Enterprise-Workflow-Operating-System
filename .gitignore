@@ -4,3 +4,5 @@ __pycache__/
 .env
 .chroma/
 .llm_cache/
+.chroma/
+.emb_cache/

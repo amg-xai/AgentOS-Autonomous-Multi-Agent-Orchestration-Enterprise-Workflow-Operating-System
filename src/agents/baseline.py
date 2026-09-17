@@ -1,12 +1,13 @@
 import json, re
 from src.tools import mock_tools as T
 from src.llm import call_llm
+from src.memory import store
 
 def run_baseline(alert: str, data: dict, incident_id: str = "incident-001") -> dict:
     context = (
         f"Alert: {alert}\n\nSlack thread:\n{T.slack_thread(data)}\n\n"
         f"Logs:\n{T.fetch_logs(data)}\n\nRecent deploys:\n{T.recent_deploys(data)}\n\n"
-        f"Past incidents:\n{T.search_incidents(data)}"
+        f"Past incidents (memory):\n{store.retrieve(alert)}"
     )
     raw = call_llm(
         "You are a SINGLE incident-response agent. Read everything and SYNTHESIZE a draft incident record. "

@@ -1,6 +1,7 @@
 import json
 from src.tools import mock_tools as T
 from src.llm import call_llm
+from src.memory import store
 
 def supervisor(state):
     plan = call_llm("You are the SUPERVISOR agent for incident response. Make a short investigation plan.",
@@ -24,8 +25,8 @@ def deploy_correlator(state):
     return {"deploy_correlation": out, "trace": [{"node": "deploy_correlator", "out": out}]}
 
 def duplicate_finder(state):
-    out = call_llm("You are the JIRA duplicate-finder agent. Find related past incidents.",
-                   T.search_incidents(state.get("data", {})))
+    query = str(state.get("alert","")) + " " + str(state.get("data",{}).get("logs",""))
+    out = store.retrieve(query, k=3)
     return {"related_incidents": out, "trace": [{"node": "duplicate_finder", "out": out}]}
 
 def synthesizer(state):
