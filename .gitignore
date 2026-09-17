@@ -6,3 +6,4 @@ __pycache__/
 .llm_cache/
 .chroma/
 .emb_cache/
+logs/
